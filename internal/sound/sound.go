@@ -8,8 +8,16 @@ import (
 	"time"
 
 	"github.com/egoist/mygo/audio"
-	"github.com/ntnyq/cyber-game/internal/records"
 )
+
+// Config controls playback. Volumes are percentages in the range 0–100.
+type Config struct {
+	Master  float64
+	Music   float64
+	Effects float64
+	Muted   bool
+	Dynamic bool
+}
 
 type Stage int32
 
@@ -76,7 +84,7 @@ type Engine struct {
 	source    *synth
 	effects   map[string]*audio.Sound
 	voices    []*audio.Player
-	settings  records.Settings
+	settings  Config
 	lastError time.Time
 }
 
@@ -108,7 +116,7 @@ func New() *Engine {
 	e.music.SetVolume(1).Play()
 	return e
 }
-func (e *Engine) Update(stage Stage, s records.Settings) {
+func (e *Engine) Update(stage Stage, s Config) {
 	if e == nil {
 		return
 	}

@@ -1,9 +1,6 @@
 package game
 
 import (
-	"context"
-	"errors"
-	"reflect"
 	"testing"
 	"time"
 )
@@ -48,6 +45,7 @@ func TestRulesAndScoring(t *testing.T) {
 		t.Fatal(s.Score())
 	}
 }
+
 func TestMatchingSuffixAndPermanentUpload(t *testing.T) {
 	ok, k := Progress([]string{"1C", "1C", "1C"}, []string{"1C", "1C", "55"})
 	if ok || k != 2 {
@@ -58,6 +56,7 @@ func TestMatchingSuffixAndPermanentUpload(t *testing.T) {
 		t.Fatal("upload lost")
 	}
 }
+
 func TestEndOrderingAndClock(t *testing.T) {
 	s := New(TutorialPuzzle(), Standard, false, "last", time.Now())
 	s.Puzzle.Board[0] = "FF"
@@ -88,6 +87,7 @@ func TestEndOrderingAndClock(t *testing.T) {
 		t.Fatal("empty score")
 	}
 }
+
 func TestPracticeUndoAndValidation(t *testing.T) {
 	s := New(TutorialPuzzle(), Practice, true, "practice", time.Now())
 	s.Select(1, time.Now())
@@ -138,53 +138,5 @@ func TestTutorialValidation(t *testing.T) {
 				t.Fatal("invalid tutorial accepted")
 			}
 		})
-	}
-}
-func TestGenerationProperties(t *testing.T) {
-	for d := Difficulty(0); d < 4; d++ {
-		for seed := uint64(0); seed < 250; seed++ {
-			p, err := Generate(context.Background(), seed, d)
-			if err != nil {
-				t.Fatal(d, seed, err)
-			}
-			if err = p.Validate(); err != nil {
-				t.Fatal(err)
-			}
-			r := d.Rules()
-			if MinimumCodes(p.Targets) < r.MinPath || len(p.Solution) > r.MaxPath {
-				t.Fatal("difficulty outside bounds")
-			}
-			again, _ := Generate(context.Background(), seed, d)
-			if !reflect.DeepEqual(p, again) {
-				t.Fatal("unstable generator")
-			}
-		}
-	}
-	ctx, cancel := context.WithCancel(context.Background())
-	cancel()
-	if _, err := Generate(ctx, 1, 0); !errors.Is(err, context.Canceled) {
-		t.Fatal(err)
-	}
-}
-func TestSolverContinuationAndBudget(t *testing.T) {
-	s := New(TutorialPuzzle(), Practice, true, "hint", time.Now())
-	for _, cell := range s.Puzzle.Solution[:3] {
-		s.Select(cell, time.Now())
-	}
-	path, err := Solve(context.Background(), s, 250000)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, cell := range path {
-		if !s.Select(cell, time.Now()) {
-			t.Fatal("illegal hint")
-		}
-	}
-	if s.Reason != Complete {
-		t.Fatal("hint not a full solution")
-	}
-	s = New(TutorialPuzzle(), Practice, true, "budget", time.Now())
-	if _, err := Solve(context.Background(), s, 0); !errors.Is(err, ErrBudget) {
-		t.Fatal(err)
 	}
 }

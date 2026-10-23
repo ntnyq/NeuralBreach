@@ -3,7 +3,6 @@ package records
 
 import (
 	"context"
-	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -47,12 +46,14 @@ type Data struct {
 }
 
 func Empty() Data { return Data{Version: 1, Settings: Defaults(), History: []game.Session{}} }
+
 func (d Data) Clone() Data {
 	b, _ := json.Marshal(d)
 	var out Data
 	_ = json.Unmarshal(b, &out)
 	return out
 }
+
 func (d *Data) Finish(s game.Session) {
 	if s.Mode != game.Tutorial {
 		d.RememberPuzzle(s.Puzzle)
@@ -254,57 +255,4 @@ func (s *Store) Repair() (Data, error) {
 	s.revision = d.Revision
 	s.data = d.Clone()
 	return d, nil
-}
-func Better(a, b game.Session) bool {
-	if a.Score().Total != b.Score().Total {
-		return a.Score().Total > b.Score().Total
-	}
-	if a.Uploaded() != b.Uploaded() {
-		return a.Uploaded() > b.Uploaded()
-	}
-	if len(a.Steps) != len(b.Steps) {
-		return len(a.Steps) < len(b.Steps)
-	}
-	if a.ElapsedMS != b.ElapsedMS {
-		return a.ElapsedMS < b.ElapsedMS
-	}
-	return a.FinishedAt.Before(b.FinishedAt)
-}
-func (d Data) Best(level game.Difficulty) *game.Session {
-	var best *game.Session
-	for _, s := range d.History {
-		if s.Mode != game.Standard || s.Reason == game.Abandoned || s.Puzzle.Difficulty != level || s.Puzzle.Version != game.Version {
-			continue
-		}
-		if best == nil || Better(s, *best) {
-			copy := s
-			best = &copy
-		}
-	}
-	return best
-}
-func (d Data) Stats() (played, wins, high int) {
-	for _, s := range d.History {
-		if s.Mode != game.Standard || s.Reason == game.Abandoned {
-			continue
-		}
-		played++
-		if s.Reason == game.Complete {
-			wins++
-		}
-		high = max(high, s.Score().Total)
-	}
-	return
-}
-func CSV(history []game.Session) ([]byte, error) {
-	var b strings.Builder
-	w := csv.NewWriter(&b)
-	_ = w.Write([]string{"id", "finished_at", "mode", "difficulty", "seed", "result", "score", "uploaded", "steps", "elapsed_ms", "resumes", "hints", "undos"})
-	for _, s := range history {
-		if err := w.Write([]string{s.ID, s.FinishedAt.Format(time.RFC3339), string(s.Mode), strconv.Itoa(int(s.Puzzle.Difficulty)), strconv.FormatUint(s.Puzzle.Seed, 10), string(s.Reason), strconv.Itoa(s.Score().Total), strconv.Itoa(s.Uploaded()), strconv.Itoa(len(s.Steps)), strconv.FormatInt(s.ElapsedMS, 10), strconv.Itoa(s.Resumes), strconv.Itoa(s.Hints), strconv.Itoa(s.Undos)}); err != nil {
-			return nil, err
-		}
-	}
-	w.Flush()
-	return []byte(b.String()), w.Error()
 }

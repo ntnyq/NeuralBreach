@@ -4,10 +4,12 @@
 
 Neural Breach is an offline native puzzle game built with Go 1.27.3 and MyGo v0.6.2. The pinned MyGo CLI is a Go tool; Node.js is only used for the VitePress documentation.
 
-- `main.go`, `window.go`, `view.go`, and `menu.go` compose lifecycle, game navigation, native views, and commands.
-- `internal/game` owns deterministic rules, puzzle generation, bounded hint search, and scoring.
-- `internal/records` stores preferences, the active slot, and history in one versioned snapshot.
-- `internal/sound` synthesizes original music and preloads effects. `storage` supplies atomic writes; `tasks` rejects stale background callbacks.
+- `main.go` is the native entry point. `window.go` owns shared state, navigation, lifecycle, and background-task dispatch; `menu.go` defines commands.
+- `session.go`, `generation.go`, `persistence.go`, and `settings.go` own session actions, puzzle-generation orchestration, persistence/export, and settings/audio synchronization.
+- `view.go` provides page dispatch, shared layout, and display labels. `view_menu.go`, `view_game.go`, `view_records.go`, and `view_settings.go` own their pages; record filtering and replay state stay with the records views. `theme.go` owns styles, shared controls, and visual effects.
+- `internal/game` owns deterministic rules and scoring, with generation in `puzzle.go` and bounded hint search in `solver.go`.
+- `internal/records` stores preferences, the active slot, and history in one versioned snapshot; `stats.go` and `export.go` own statistics and CSV encoding.
+- `internal/sound` synthesizes original music and preloads effects using its own playback configuration. `storage` supplies atomic writes; `tasks` rejects stale background callbacks.
 - `locales/` contains five catalogs and generated accessors. `resources/fonts/` embeds licensed Rajdhani fonts.
 - `docs/` contains the player guide, architecture, release instructions, and the original design reference.
 - `tools/genicon` generates the app icon; `tools/releaseassets` validates release packages.
