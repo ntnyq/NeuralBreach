@@ -1,0 +1,22 @@
+{
+  "oxc.enable": true,
+  "eslint.enable": false,
+  "prettier.enable": false,
+  "editor.defaultFormatter": "oxc.oxc-vscode",
+  "editor.codeActionsOnSave": {
+    "source.format.oxc": "explicit"
+  },
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  },
+  "cSpell.words": [
+    "esbuild",
+    "GOARCH",
+    "gofmt",
+    "GOTOOLCHAIN",
+    "mygo",
+    "purego",
+    "vitepress",
+    "Rajdhani"
+  ]
+}

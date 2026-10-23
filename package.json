@@ -1,0 +1,22 @@
+{
+  "name": "neural-breach",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Offline native breach-protocol puzzle game",
+  "keywords": [],
+  "homepage": "https://neural-breach.ntnyq.dev",
+  "workspaces": [
+    "docs"
+  ],
+  "type": "module",
+  "scripts": {
+    "docs:build": "pnpm -C docs run build",
+    "docs:dev": "pnpm -C docs run dev",
+    "docs:preview": "pnpm -C docs run preview",
+    "format": "oxfmt"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.74.0"
+  },
+  "packageManager": "pnpm@12.15.0"
+}

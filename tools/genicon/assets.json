@@ -1,0 +1,11 @@
+{
+  "renderer": "0.48.1",
+  "sha256": {
+    "docs/public/favicon.ico": "0621b5542f773fcfd7ea15a44093ee79bced37f1d6ac665cea8e65a82d76dccf",
+    "docs/public/icon.png": "b3b7624b3e956aa077dbc16a209678c1a356bd6ff2fc72893133de20fd1c32db",
+    "docs/public/icon.svg": "999ef7274ba30e570702fb4173121516f7b705cffe483e1a3b8a4d7d2c4172c9",
+    "resources/icon-macos.svg": "999ef7274ba30e570702fb4173121516f7b705cffe483e1a3b8a4d7d2c4172c9",
+    "resources/icon.png": "b3b7624b3e956aa077dbc16a209678c1a356bd6ff2fc72893133de20fd1c32db",
+    "tools/genicon/main.go": "4fd1a4e812e2d2a22d6e394731d307670d18e4b26eeb077764502a115b9e549e"
+  }
+}

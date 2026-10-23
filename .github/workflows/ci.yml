@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Verify formatting
+        run: test -z "$(gofmt -l .)"
+      - name: Validate translations and generated accessors
+        run: |
+          make i18n
+          make generate
+          git diff --exit-code -- locales/catalog_gen.go
+      - name: Test with race detector
+        run: go test -race ./...
+      - name: Verify generated icons
+        run: make icon-check
+      - name: Vet Go and native UI
+        run: go tool mygo vet
+      - name: Compile Windows and Linux
+        run: |
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o build/neural-breach.exe .
+          GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/neural-breach-linux .
+      - name: Build macOS app
+        run: |
+          make icon-check
+          go tool mygo build -skip-dmg
+      - uses: actions/upload-artifact@v7
+        with:
+          name: desktop-builds
+          path: build/

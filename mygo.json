@@ -1,0 +1,12 @@
+{
+  "name": "Neural Breach",
+  "identifier": "com.ntnyq.neural-breach",
+  "version": "0.1.0",
+  "copyright": "© 2026 ntnyq",
+  "out": "build",
+  "icon": "resources/icon.png",
+  "i18n": {
+    "dir": "locales",
+    "source": "en"
+  }
+}

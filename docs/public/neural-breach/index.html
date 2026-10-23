@@ -1,0 +1,597 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>神经裂隙 · 视听设计预览</title>
+    <link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48 64x64" />
+    <link rel="icon" href="../icon.svg" type="image/svg+xml" sizes="any" />
+    <link rel="stylesheet" href="fonts.css" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #100c10;
+        --red: #f25b64;
+        --cyan: #75f0e7;
+        --yellow: #fcee09;
+        --text: #e6dde1;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font:
+          500 16px/1.6 'Rajdhani',
+          'PingFang SC',
+          sans-serif;
+      }
+      header {
+        padding: 24px 32px 18px;
+        border-bottom: 1px solid #79313d;
+        display: flex;
+        align-items: baseline;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      h1 {
+        margin: 0;
+        color: var(--yellow);
+        font-size: 27px;
+        letter-spacing: 2px;
+      }
+      header p {
+        margin: 0;
+        color: #cda6ae;
+      }
+      a {
+        color: var(--cyan);
+        text-underline-offset: 4px;
+      }
+      main {
+        max-width: 1680px;
+        margin: auto;
+        padding: 20px 32px 32px;
+      }
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-bottom: 18px;
+      }
+      button,
+      select {
+        font: inherit;
+        color: var(--red);
+        border: 1px solid #9e414b;
+        background: #1a1016;
+        padding: 8px 15px;
+        cursor: pointer;
+        border-radius: 0;
+      }
+      button:hover,
+      select:hover {
+        border-color: var(--cyan);
+      }
+      button[aria-pressed='true'] {
+        color: #071416;
+        background: var(--cyan);
+        border-color: var(--cyan);
+      }
+      button:focus-visible,
+      select:focus-visible,
+      input:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--yellow);
+        outline-offset: 4px;
+      }
+      .stage {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #77323e;
+        background: #0c090c;
+        aspect-ratio: 16/9;
+        isolation: isolate;
+      }
+      .stage img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .effects {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .fragment {
+        position: absolute;
+        opacity: 0;
+        animation: fragment var(--duration) steps(1, end) forwards;
+        background: var(--color);
+      }
+      .slice {
+        background-size: 100% auto;
+        background-repeat: no-repeat;
+        mix-blend-mode: screen;
+      }
+      @keyframes fragment {
+        0% {
+          opacity: 0;
+          transform: translateX(0);
+        }
+        10% {
+          opacity: 0.8;
+          transform: translateX(var(--shift));
+        }
+        35% {
+          opacity: 0;
+          transform: translateX(0);
+        }
+        62% {
+          opacity: 0.65;
+          transform: translateX(calc(var(--shift) * -0.6));
+        }
+        100% {
+          opacity: 0;
+          transform: none;
+        }
+      }
+      .controls {
+        margin-top: 18px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .controls label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .controls .primary {
+        color: var(--yellow);
+        border-color: var(--yellow);
+      }
+      input[type='range'] {
+        accent-color: var(--cyan);
+        width: 110px;
+      }
+      input[type='checkbox'] {
+        accent-color: var(--cyan);
+        width: 17px;
+        height: 17px;
+      }
+      .description {
+        margin: 18px 0 0;
+        padding: 14px 18px;
+        background: #1b1117;
+        border-left: 3px solid var(--red);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px 25px;
+      }
+      #status {
+        color: var(--cyan);
+      }
+      .note {
+        font-size: 13px;
+        color: #bd9ea6;
+        margin: 12px 0 0;
+      }
+      @media (max-width: 750px) {
+        header {
+          padding: 18px;
+        }
+        main {
+          padding: 16px;
+        }
+        h1 {
+          font-size: 22px;
+        }
+        button,
+        select {
+          padding: 8px 10px;
+        }
+        .controls {
+          gap: 10px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .fragment {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>神经裂隙 / Neural Breach</h1>
+      <p>界面 · 故障动效 · 原创合成器氛围</p>
+      <a href="../game-design.html" data-local-doc="../../game-design.md"
+        >规则与设计文档</a
+      >
+      <a href="typography.html">真实字体实样</a>
+    </header>
+    <main>
+      <nav aria-label="界面选择" id="screens"></nav>
+      <div class="stage" id="stage">
+        <img
+          id="screen"
+          src="01-main-menu-v2.png"
+          alt="游戏主菜单字体修订设计图"
+        />
+        <div class="effects" id="effects" aria-hidden="true"></div>
+      </div>
+      <div class="controls" aria-label="故障动画预览">
+        <button class="primary" data-effect="menu">菜单切换 · 160ms</button>
+        <button data-effect="upload">魔偶上传 · 140ms</button>
+        <button data-effect="failure">断连故障 · 320ms</button>
+        <label
+          >故障强度<select id="intensity">
+            <option value="0">关闭</option>
+            <option value="1" selected>低</option>
+            <option value="2">中</option>
+            <option value="3">高</option>
+          </select></label
+        >
+        <label><input id="reduce" type="checkbox" />减少动态效果</label>
+      </div>
+      <div class="controls" aria-label="音频预览">
+        <button id="music" aria-pressed="false">试听音乐</button>
+        <label
+          >音乐阶段<select id="phase">
+            <option value="menu">主菜单 · 氛围</option>
+            <option value="play">入侵中 · 节拍</option>
+            <option value="tension">最后 10 秒 · 紧张</option>
+          </select></label
+        >
+        <label
+          >音量<input
+            aria-label="试听音量"
+            id="volume"
+            type="range"
+            min="0"
+            max="100"
+            value="35"
+          /><output id="volumeValue">35%</output></label
+        >
+        <span>M 播放 / 静音</span>
+      </div>
+      <div class="description">
+        <strong id="title">01 / 主菜单</strong
+        ><span id="status" role="status"
+          >选择一个事件，预览瞬间的彩色故障效果。</span
+        >
+      </div>
+      <p class="note">
+        这是视听设计样片，图片内按钮不执行游戏操作。音乐由浏览器实时合成，用于确认氛围，不是最终游戏配乐。默认静音；切出页面会停止音乐；故障事件有
+        1.5 秒间隔。减少动态效果会禁用闪烁。
+      </p>
+    </main>
+    <script>
+      ;(function () {
+        'use strict'
+        const pages = [
+          ['01-main-menu-v2', '主菜单'],
+          ['02-new-game', '模式与难度'],
+          ['03-breach-game-v2', '入侵界面'],
+          ['04-results', '成功结算'],
+          ['05-records', '记录'],
+          ['06-settings', '设置'],
+          ['07-pause', '暂停'],
+          ['08-tutorial', '教程'],
+          ['09-state-variants', '失败与退出'],
+        ]
+        const $ = function (id) {
+          return document.getElementById(id)
+        }
+        const screen = $('screen'),
+          effects = $('effects'),
+          status = $('status')
+        const reducedPreference = window.matchMedia(
+          '(prefers-reduced-motion: reduce)',
+        )
+        $('reduce').checked = reducedPreference.matches
+        reducedPreference.addEventListener('change', function (event) {
+          $('reduce').checked = event.matches
+          effects.replaceChildren()
+        })
+        let lastBurst = -Infinity
+        let selected = 0
+        pages.forEach(function (page, index) {
+          const button = document.createElement('button')
+          button.textContent = page[1]
+          button.setAttribute('aria-pressed', String(index === 0))
+          button.addEventListener('click', function () {
+            selected = index
+            screen.src = page[0] + '.png'
+            screen.alt = page[1] + '设计图'
+            $('title').textContent =
+              String(index + 1).padStart(2, '0') + ' / ' + page[1]
+            document
+              .querySelectorAll('#screens button')
+              .forEach(function (item, idx) {
+                item.setAttribute('aria-pressed', String(idx === index))
+              })
+            status.textContent = page[1] + ' · 视觉概念稿'
+          })
+          $('screens').append(button)
+        })
+        screen.addEventListener('error', function () {
+          status.textContent = '图片未加载，请保留 HTML 与 PNG 在同一目录。'
+        })
+        $('reduce').addEventListener('change', function () {
+          effects.replaceChildren()
+        })
+        function burst(kind) {
+          const intensity = Number($('intensity').value)
+          const now = performance.now()
+          if (now - lastBurst < 1500) {
+            status.textContent = '故障冷却中 · 避免连续闪烁'
+            return
+          }
+          lastBurst = now
+          const names = {
+            menu: '菜单切换',
+            upload: '魔偶上传成功',
+            failure: '连接已断开',
+          }
+          status.textContent =
+            names[kind] +
+            ' · ' +
+            (intensity === 0 || $('reduce').checked || reducedPreference.matches
+              ? '静态反馈'
+              : '短促彩色切片')
+          playEvent(kind)
+          if (
+            intensity === 0 ||
+            $('reduce').checked ||
+            reducedPreference.matches
+          )
+            return
+          const duration =
+            kind === 'failure' ? 320 : kind === 'upload' ? 140 : 160
+          effects.replaceChildren()
+          for (let i = 0; i < 8 + intensity * 4; i++) {
+            const fragment = document.createElement('span')
+            fragment.className = 'fragment'
+            const colors = ['#75f0e7', '#f25b64', '#fcee09', '#b06ad9']
+            fragment.style.setProperty('--color', colors[i % colors.length])
+            fragment.style.setProperty('--duration', duration + 'ms')
+            fragment.style.setProperty(
+              '--shift',
+              (i % 2 ? 1 : -1) * intensity * 4 + 'px',
+            )
+            const edge = i % 4
+            let x, y
+            if (kind === 'upload') {
+              x = 88 + Math.random() * 9
+              y = 31 + Math.random() * 7
+            } else {
+              x = edge < 2 ? Math.random() * 91 : edge === 2 ? 0 : 96
+              y =
+                edge < 2
+                  ? edge === 0
+                    ? Math.random() * 3
+                    : 96 + Math.random() * 3
+                  : Math.random() * 96
+            }
+            fragment.style.left = x + '%'
+            fragment.style.top = y + '%'
+            fragment.style.width = 1 + Math.random() * 7 + '%'
+            fragment.style.height = 1 + Math.random() * 3 + 'px'
+            fragment.style.animationDelay = (i % 3) * 12 + 'ms'
+            if (i % 4 === 0 && kind !== 'upload') {
+              fragment.classList.add('slice')
+              fragment.style.backgroundImage =
+                'url("' + pages[selected][0] + '.png")'
+              fragment.style.width = '100%'
+              fragment.style.left = '0'
+              fragment.style.height = 3 + intensity + 'px'
+              fragment.style.backgroundSize = $('stage').clientWidth + 'px auto'
+              fragment.style.backgroundPositionY =
+                -((y / 100) * $('stage').clientHeight) + 'px'
+              fragment.style.filter =
+                'hue-rotate(' + i * 19 + 'deg) saturate(2)'
+            }
+            effects.append(fragment)
+          }
+          window.setTimeout(function () {
+            effects.replaceChildren()
+          }, duration + 100)
+        }
+        document.querySelectorAll('[data-effect]').forEach(function (button) {
+          button.addEventListener('click', function () {
+            burst(button.dataset.effect)
+          })
+        })
+
+        let audioContext, master, scheduler
+        let musicOn = false,
+          toggling = false,
+          nextTime = 0,
+          step = 0
+        const phase = $('phase')
+        function tone(frequency, start, length, gain, type, endFrequency) {
+          const oscillator = audioContext.createOscillator()
+          const envelope = audioContext.createGain()
+          oscillator.type = type || 'triangle'
+          oscillator.frequency.setValueAtTime(frequency, start)
+          if (endFrequency)
+            oscillator.frequency.exponentialRampToValueAtTime(
+              endFrequency,
+              start + length,
+            )
+          envelope.gain.setValueAtTime(0.0001, start)
+          envelope.gain.exponentialRampToValueAtTime(
+            Math.max(gain, 0.0002),
+            start + 0.012,
+          )
+          envelope.gain.exponentialRampToValueAtTime(0.0001, start + length)
+          oscillator.connect(envelope)
+          envelope.connect(master)
+          oscillator.start(start)
+          oscillator.stop(start + length + 0.03)
+          oscillator.onended = function () {
+            oscillator.disconnect()
+            envelope.disconnect()
+          }
+        }
+        function noise(start, length, gain) {
+          const buffer = audioContext.createBuffer(
+            1,
+            Math.ceil(audioContext.sampleRate * length),
+            audioContext.sampleRate,
+          )
+          const samples = buffer.getChannelData(0)
+          for (let i = 0; i < samples.length; i++)
+            samples[i] =
+              (Math.random() * 2 - 1) * Math.pow(1 - i / samples.length, 4)
+          const source = audioContext.createBufferSource()
+          const filter = audioContext.createBiquadFilter()
+          const envelope = audioContext.createGain()
+          source.buffer = buffer
+          filter.type = 'highpass'
+          filter.frequency.value = 3500
+          envelope.gain.value = gain
+          source.connect(filter)
+          filter.connect(envelope)
+          envelope.connect(master)
+          source.start(start)
+          source.onended = function () {
+            source.disconnect()
+            filter.disconnect()
+            envelope.disconnect()
+          }
+        }
+        function schedule() {
+          if (!musicOn || audioContext.state !== 'running') return
+          const beat = 60 / 100 / 4
+          if (nextTime < audioContext.currentTime)
+            nextTime = audioContext.currentTime + 0.025
+          while (nextTime < audioContext.currentTime + 0.15) {
+            const mode = phase.value
+            const root = [55, 55, 65.406, 49][Math.floor(step / 16) % 4]
+            if (step % 8 === 0) {
+              tone(root, nextTime, 1.1, 0.13, 'sine')
+              tone(root * 3, nextTime, 1.0, 0.025, 'triangle')
+            }
+            if (mode !== 'menu') {
+              if (step % 4 === 0) tone(115, nextTime, 0.17, 0.2, 'sine', 38)
+              if (step % 8 === 4) noise(nextTime, 0.1, 0.11)
+              if (step % 2 === 0)
+                tone(
+                  root * [1, 2, 1.5, 2][Math.floor(step / 2) % 4],
+                  nextTime,
+                  0.17,
+                  0.065,
+                  'triangle',
+                )
+            }
+            if (mode === 'tension') {
+              noise(nextTime, 0.045, 0.05)
+              if (step % 2 === 1)
+                tone(root * 8, nextTime, 0.09, 0.018, 'square')
+            }
+            step++
+            nextTime += beat
+          }
+        }
+        function playEvent(kind) {
+          if (!musicOn || !audioContext || audioContext.state !== 'running')
+            return
+          const start = audioContext.currentTime + 0.01
+          if (kind === 'upload') {
+            tone(440, start, 0.09, 0.08)
+            tone(660, start + 0.07, 0.12, 0.065)
+          } else if (kind === 'failure') {
+            tone(100, start, 0.3, 0.14, 'sawtooth', 35)
+            noise(start, 0.16, 0.07)
+          } else {
+            noise(start, 0.065, 0.08)
+            tone(880, start, 0.035, 0.025, 'square')
+          }
+        }
+        function stopMusic() {
+          musicOn = false
+          clearInterval(scheduler)
+          $('music').textContent = '试听音乐'
+          $('music').setAttribute('aria-pressed', 'false')
+          if (master && audioContext)
+            master.gain.setTargetAtTime(0, audioContext.currentTime, 0.07)
+        }
+        async function toggleMusic() {
+          if (toggling) return
+          if (musicOn) {
+            stopMusic()
+            return
+          }
+          toggling = true
+          try {
+            if (!audioContext) {
+              const Audio = window.AudioContext || window.webkitAudioContext
+              if (!Audio) throw new Error('当前浏览器不支持 Web Audio')
+              audioContext = new Audio()
+              master = audioContext.createGain()
+              master.gain.value = 0
+              master.connect(audioContext.destination)
+            }
+            await audioContext.resume()
+            if (document.hidden) return
+            musicOn = true
+            master.gain.setTargetAtTime(
+              (Number($('volume').value) / 100) * 0.5,
+              audioContext.currentTime,
+              0.12,
+            )
+            nextTime = audioContext.currentTime + 0.05
+            schedule()
+            scheduler = setInterval(schedule, 50)
+            $('music').textContent = '停止音乐'
+            $('music').setAttribute('aria-pressed', 'true')
+            status.textContent = '正在试听原创合成器氛围 · 可切换音乐阶段'
+          } catch (error) {
+            stopMusic()
+            status.textContent = '无法启动音频：' + error.message
+          } finally {
+            toggling = false
+          }
+        }
+        $('music').addEventListener('click', toggleMusic)
+        $('volume').addEventListener('input', function () {
+          $('volumeValue').textContent = $('volume').value + '%'
+          if (musicOn)
+            master.gain.setTargetAtTime(
+              (Number($('volume').value) / 100) * 0.5,
+              audioContext.currentTime,
+              0.05,
+            )
+        })
+        document.addEventListener('keydown', function (event) {
+          if (
+            event.key.toLowerCase() === 'm' &&
+            !event.repeat &&
+            !['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
+          ) {
+            event.preventDefault()
+            toggleMusic()
+          }
+        })
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) {
+            stopMusic()
+            effects.replaceChildren()
+          }
+        })
+        window.addEventListener('pagehide', function () {
+          stopMusic()
+          if (audioContext) audioContext.close()
+        })
+      })()
+    </script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+# Logo concept: breached matrix
+
+Generated with the built-in imagegen tool. Asset: `../../../resources/logo-maze-concept.png`. This is a design concept; the packaged application icon has not been replaced.
+
+## Prompt
+
+Design ONE finished premium app logo for "Neural Breach", an offline code-breaking puzzle game. Square image, solid near-black plum background #100C10, perfectly clean flat vector aesthetic. Center a compact, powerful abstract symbol: a bold acid-yellow #FCEE09 square labyrinth with one open corner and a short decisive negative-space path that turns twice into its center. The symbol should feel like a locked code matrix being breached, with a strong unified silhouette and very few geometric parts. Use broad uniform strokes, precise right angles, one subtle chamfer, generous negative space. A single small cyan #75F0E7 square at the inner end of the path is the only accent. Symbol occupies 58% of the square canvas. Art direction: timeless modernist identity, clever negative space, expertly proportioned, calm and confident, immediately recognizable at 32 pixels. Absolutely no letters, no N, no wordmark, no typography, no lightning bolt, no thin circuits, no distressed texture, no noise, no gradients, no glow, no shadows, no 3D, no mockups, no border, no extra versions. Flat immaculate uniform colors and smooth crisp edges. The final image IS the logo asset, not a presentation sheet.

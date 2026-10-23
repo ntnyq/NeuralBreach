@@ -1,0 +1,19 @@
+.DS_Store
+node_modules
+*.log*
+*.local
+
+docs/.vitepress/cache/
+
+dist/
+/build/
+/snapshots/
+/.mygo/
+/cyber-game
+/neural-breach
+*.test
+*.prof
+coverage.out
+
+# MyGo update signing secrets
+mygo-update.key

@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>神经裂隙 · 字体实样</title>
+    <link rel="icon" href="../favicon.ico" sizes="16x16 32x32 48x48 64x64" />
+    <link rel="icon" href="../icon.svg" type="image/svg+xml" sizes="any" />
+    <link rel="stylesheet" href="fonts.css" />
+    <style>
+      :root {
+        color-scheme: dark;
+        --red: #f25b64;
+        --cyan: #75f0e7;
+        --yellow: #fcee09;
+        --weight: 500;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: #100c10;
+        color: #e6dde1;
+        font:
+          17px/1.6 'Rajdhani',
+          'PingFang SC',
+          'Microsoft YaHei',
+          sans-serif;
+        font-weight: 500;
+      }
+      main {
+        max-width: 1440px;
+        margin: auto;
+        padding: 35px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        border-bottom: 1px solid #79333e;
+        padding-bottom: 20px;
+      }
+      h1 {
+        font-size: 27px;
+        letter-spacing: 2px;
+        font-weight: 500;
+        margin: 0;
+        color: var(--yellow);
+      }
+      p {
+        margin: 8px 0;
+      }
+      a {
+        color: var(--cyan);
+      }
+      .meta {
+        color: #bda4aa;
+        font-size: 15px;
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 24px 0;
+      }
+      select {
+        font: inherit;
+        background: #25131b;
+        color: var(--cyan);
+        padding: 7px 20px;
+        border: 1px solid var(--red);
+      }
+      select:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--yellow);
+        outline-offset: 4px;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 28px;
+      }
+      .panel {
+        padding: 26px;
+        border: 1px solid #8e3e4a;
+        background: #160e14;
+      }
+      .label {
+        color: var(--red);
+        font-size: 14px;
+      }
+      .title {
+        font-size: 58px;
+        line-height: 1.1;
+        color: var(--yellow);
+        font-weight: 600;
+        letter-spacing: 2px;
+        margin: 14px 0 27px;
+      }
+      .menu {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+      .menu li {
+        font-weight: 400;
+        font-size: 28px;
+        line-height: 1.7;
+        padding: 12px 18px;
+        color: var(--red);
+        border-bottom: 1px solid #3e202a;
+      }
+      .menu .selected {
+        color: var(--cyan);
+        background: #12292c;
+        border: 1px solid var(--cyan);
+      }
+      .menu small {
+        font:
+          500 20px Rajdhani,
+          sans-serif;
+        color: inherit;
+        opacity: 0.7;
+        margin-left: 18px;
+      }
+      .note {
+        font-size: 14px;
+        color: #c6aeb5;
+        margin-top: 18px;
+      }
+      .hud {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #67333d;
+        padding-bottom: 16px;
+      }
+      .timer {
+        font:
+          600 70px/1 Rajdhani,
+          sans-serif;
+        color: var(--yellow);
+        font-variant-numeric: tabular-nums;
+      }
+      .chinese {
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--yellow);
+      }
+      .matrix {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        margin: 24px 0;
+        border-left: 1px solid #48232d;
+        border-top: 1px solid #48232d;
+      }
+      .code {
+        font-family: Rajdhani, sans-serif;
+        font-size: 33px;
+        font-weight: var(--weight);
+        text-align: center;
+        padding: 13px 0;
+        border-right: 1px solid #48232d;
+        border-bottom: 1px solid #48232d;
+        color: #d7bbc3;
+      }
+      .code:nth-child(6n + 5) {
+        background: #333010;
+        color: var(--yellow);
+      }
+      .code:nth-child(29) {
+        color: var(--cyan);
+        outline: 2px solid var(--cyan);
+        outline-offset: -2px;
+      }
+      .buffer {
+        display: flex;
+        gap: 7px;
+      }
+      .buffer span {
+        width: 49px;
+        height: 49px;
+        border: 1px solid var(--red);
+        text-align: center;
+        font:
+          500 28px/49px Rajdhani,
+          sans-serif;
+        color: var(--cyan);
+      }
+      .compare {
+        margin-top: 28px;
+        padding-top: 20px;
+        border-top: 1px solid #6f303b;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+      }
+      .sample {
+        font-size: 30px;
+        line-height: 1.4;
+        margin: 10px 0;
+        overflow-wrap: anywhere;
+      }
+      .before {
+        font-family: system-ui, sans-serif;
+        font-weight: 700;
+      }
+      .after {
+        font-family: Rajdhani, sans-serif;
+        font-weight: var(--weight);
+        color: var(--cyan);
+        font-size: 36px;
+      }
+      footer {
+        margin-top: 25px;
+        color: #bda4aa;
+        font-size: 14px;
+        border-top: 1px solid #5c2c37;
+        padding-top: 18px;
+      }
+      @media (max-width: 800px) {
+        main {
+          padding: 20px;
+        }
+        .layout,
+        .compare {
+          grid-template-columns: 1fr;
+        }
+        header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+        .title {
+          font-size: 45px;
+        }
+        .menu li {
+          font-size: 24px;
+        }
+        .code {
+          font-size: 28px;
+          padding: 8px 0;
+        }
+        .buffer span {
+          width: 36px;
+          height: 40px;
+          line-height: 40px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div>
+          <h1>字体实样 / Typography revision</h1>
+          <p class="meta">
+            英文与数字：真实 Rajdhani
+            文件　｜　中文：系统黑体回退，尚未嵌入晶熙黑
+          </p>
+        </div>
+        <a href="index.html">返回视听预览</a>
+      </header>
+      <div class="toolbar">
+        <label for="weight">英数实样字重</label
+        ><select id="weight">
+          <option value="400">Regular 400</option>
+          <option value="500" selected>Medium 500</option>
+          <option value="600">SemiBold 600</option>
+          <option value="700">Bold 700</option></select
+        ><span class="meta" id="fontStatus">正在加载字体…</span>
+      </div>
+      <div class="layout">
+        <section class="panel">
+          <div class="label">主菜单排版 / Menu typography</div>
+          <div class="title">NEURAL<br />BREACH</div>
+          <ul class="menu">
+            <li class="selected">开始游戏 <small>New game</small></li>
+            <li>继续游戏 <small>Continue</small></li>
+            <li>查看记录 <small>Records</small></li>
+            <li>设置 <small>Settings</small></li>
+            <li>退出游戏 <small>Quit game</small></li>
+          </ul>
+          <p class="note">
+            中文保持正常字宽，减轻字重与字号；不把 Logo 的破碎斜体用于操作文字。
+          </p>
+        </section>
+        <section class="panel">
+          <div class="hud">
+            <div>
+              <div class="label">剩余时间 / Time remaining</div>
+              <div class="timer">42.00</div>
+            </div>
+            <span class="chinese">入侵协议</span>
+          </div>
+          <div class="matrix" id="matrix"></div>
+          <div class="label">缓冲区 / Buffer 3/8</div>
+          <div class="buffer">
+            <span>1C</span><span>55</span><span>BD</span><span></span
+            ><span></span><span></span><span></span><span></span>
+          </div>
+          <p class="note">
+            固定格宽负责对齐，代码本身使用 Rajdhani；该字体不是等宽字体。
+          </p>
+        </section>
+      </div>
+      <div class="compare">
+        <section>
+          <div class="label">对照 / 系统粗体</div>
+          <div class="sample before">
+            NEURAL BREACH<br />1C 55 BD E9 7A FF<br />0123456789 / 2,790
+          </div>
+        </section>
+        <section>
+          <div class="label">目标 / Rajdhani 实样</div>
+          <div class="sample after">
+            NEURAL BREACH<br />1C 55 BD E9 7A FF<br />0123456789 / 2,790
+          </div>
+        </section>
+      </div>
+      <footer>
+        <p>
+          原作英文界面以 Rajdhani
+          为主要参考；中文晶熙黑的具体版本来自模组作者的解包报告，尚未直接核验游戏文件。
+        </p>
+        <p>
+          <a
+            href="../design/neural-breach/typography.html"
+            data-local-doc="../../design/neural-breach/typography.md"
+            >证据与字体规格</a
+          >　<a
+            href="https://fontsinuse.com/uses/60926/cyberpunk-2077-video-game"
+            >游戏字体实拍分析</a
+          >　<a href="https://www.morisawa-arphic.com.tw/ar-jing-xi-hei/"
+            >晶熙黑官方字样</a
+          >
+        </p>
+      </footer>
+    </main>
+    <script>
+      if (location.protocol === 'file:')
+        document.querySelectorAll('[data-local-doc]').forEach(function (link) {
+          link.href = link.dataset.localDoc
+        })
+      const codes =
+        '55 1C E9 BD 7A FF BD E9 55 1C FF FF 7A 55 FF E9 BD 1C FF BD 1C 55 E9 7A E9 FF 7A 1C E9 BD 1C 7A BD FF 55 E9'.split(
+          ' ',
+        )
+      for (const code of codes) {
+        const cell = document.createElement('span')
+        cell.className = 'code'
+        cell.textContent = code
+        document.getElementById('matrix').append(cell)
+      }
+      document
+        .getElementById('weight')
+        .addEventListener('change', function (event) {
+          document.documentElement.style.setProperty(
+            '--weight',
+            event.target.value,
+          )
+        })
+      Promise.all(
+        [400, 500, 600, 700].map(function (weight) {
+          return document.fonts.load(weight + ' 20px Rajdhani')
+        }),
+      )
+        .then(function (loaded) {
+          document.getElementById('fontStatus').textContent = loaded.every(
+            function (faces) {
+              return faces.length > 0
+            },
+          )
+            ? 'Rajdhani 已加载 · 本地字体'
+            : '字体未加载，请保留 fonts 目录'
+        })
+        .catch(function () {
+          document.getElementById('fontStatus').textContent =
+            '字体加载失败，请保留 fonts 目录'
+        })
+    </script>
+  </body>
+</html>
