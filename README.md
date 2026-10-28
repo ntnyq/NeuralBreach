@@ -10,7 +10,7 @@ Go + MyGo 原生桌面破解益智游戏。观察十六进制矩阵，从第一�
 
 ## 运行
 
-需要 `go.mod` 指定的 Go 1.27.3 和 MyGo v0.6.2。桌面程序不依赖 Node.js。Linux 运行需要 GTK 3。
+需要 `go.mod` 指定的 Go 1.27.3 和 MyGo v0.7.1。桌面程序不依赖 Node.js。Linux 运行需要 GTK 3。
 
 ```sh
 go mod download

@@ -225,7 +225,7 @@ Esc、失焦和最小化都进入暂停，使用不透明遮罩隐藏棋盘与�
 
 ## 10. MyGo 实现映射
 
-已核对当前仓库固定的 **MyGo v0.6.2** 源码。该版本包含 `plugins/game`、`examples/mayoi`、`examples/farm` 和音频示例，足以支撑本设计。网站文档显示的版本可能领先项目，本项目以已锁定源码为准。
+设计时已核对 **MyGo v0.6.2** 源码。该版本包含 `plugins/game`、`examples/mayoi`、`examples/farm` 和音频示例，足以支撑本设计。项目当前依赖为 v0.7.1，以 `go.mod` 锁定的源码为准。
 
 | 项目部分                     | 建议职责                                       |
 | ---------------------------- | ---------------------------------------------- |
@@ -262,7 +262,7 @@ Esc、失焦和最小化都进入暂停，使用不透明遮罩隐藏棋盘与�
 - [PC Gamer：Breach Protocol 玩法介绍](https://www.pcgamer.com/how-to-cyberpunk-2077-hacking-breach-protocol/)：参考原作行列交替和序列规划的玩法。
 - [原作主菜单截图参考](https://www.mobygames.com/game/128136/cyberpunk-2077/screenshots/playstation-5/1086881/)与[破解界面截图参考](https://jkchen2.gitlab.io/cpah/development/)：参考菜单和终端的布局、色彩与视觉层次。
 
-难度参数、计分、存档、音乐触发和故障时长是本项目提案，不声称是原作数值。实现沿用固定的 MyGo v0.6.2 依赖。
+难度参数、计分、存档、音乐触发和故障时长是本项目提案，不声称是原作数值。当前实现使用固定的 MyGo v0.7.1 依赖。
 
 ## 13. 首版实现说明
 

@@ -7,7 +7,7 @@ go mod download
 make run
 ```
 
-应用使用 Go 1.27.3 / MyGo v0.6.2。Linux 桌面需要 GTK 3。Node.js 和 pnpm 只用于文档站。
+应用使用 Go 1.27.3 / MyGo v0.7.1。Linux 桌面需要 GTK 3。Node.js 和 pnpm 只用于文档站。
 
 主菜单提供开始游戏、继续游戏、查看记录、设置、退出游戏。无存档时继续入口禁用；存档损坏时显示恢复入口。首次建议打开「开始游戏 → 新手教程」。
 
