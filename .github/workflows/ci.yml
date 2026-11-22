@@ -12,8 +12,8 @@ jobs:
   check:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-go@v7
+      - uses: actions/checkout@v7.0.1
+      - uses: actions/setup-go@v7.1.0
         with:
           go-version-file: go.mod
           cache: true
@@ -32,13 +32,13 @@ jobs:
         run: go tool mygo vet
       - name: Compile Windows and Linux
         run: |
-          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -o build/neural-breach.exe .
+          GOOS=windows GOARCH=amd64 CGO_ENABLED=0 go build -tags=mygo_nowebview -o build/neural-breach.exe .
           GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o build/neural-breach-linux .
       - name: Build macOS app
         run: |
           make icon-check
           go tool mygo build -skip-dmg
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v7.0.2
         with:
           name: desktop-builds
           path: build/

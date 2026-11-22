@@ -347,24 +347,24 @@ func (msgs Messages) Observe() string {
 	return Catalog.Format(msgs.locale, "Observe", nil)
 }
 
-// ChooseRow says "Select an unused code in the highlighted row"
+// ChooseRow says "Select an unused code in row {index, number}"
 // in the language the app shows.
-func ChooseRow() string { return In(i18n.Locale()).ChooseRow() }
+func ChooseRow(index int) string { return In(i18n.Locale()).ChooseRow(index) }
 
-// ChooseRow says "Select an unused code in the highlighted row"
+// ChooseRow says "Select an unused code in row {index, number}"
 // in the language of msgs.
-func (msgs Messages) ChooseRow() string {
-	return Catalog.Format(msgs.locale, "ChooseRow", nil)
+func (msgs Messages) ChooseRow(index int) string {
+	return Catalog.Format(msgs.locale, "ChooseRow", map[string]any{"index": index})
 }
 
-// ChooseColumn says "Select an unused code in the highlighted column"
+// ChooseColumn says "Select an unused code in column {index, number}"
 // in the language the app shows.
-func ChooseColumn() string { return In(i18n.Locale()).ChooseColumn() }
+func ChooseColumn(index int) string { return In(i18n.Locale()).ChooseColumn(index) }
 
-// ChooseColumn says "Select an unused code in the highlighted column"
+// ChooseColumn says "Select an unused code in column {index, number}"
 // in the language of msgs.
-func (msgs Messages) ChooseColumn() string {
-	return Catalog.Format(msgs.locale, "ChooseColumn", nil)
+func (msgs Messages) ChooseColumn(index int) string {
+	return Catalog.Format(msgs.locale, "ChooseColumn", map[string]any{"index": index})
 }
 
 // Uploaded says "Uploaded"
@@ -575,6 +575,16 @@ func Hint() string { return In(i18n.Locale()).Hint() }
 // in the language of msgs.
 func (msgs Messages) Hint() string {
 	return Catalog.Format(msgs.locale, "Hint", nil)
+}
+
+// SuggestedCell says "Suggested next code"
+// in the language the app shows.
+func SuggestedCell() string { return In(i18n.Locale()).SuggestedCell() }
+
+// SuggestedCell says "Suggested next code"
+// in the language of msgs.
+func (msgs Messages) SuggestedCell() string {
+	return Catalog.Format(msgs.locale, "SuggestedCell", nil)
 }
 
 // Undo says "Undo"

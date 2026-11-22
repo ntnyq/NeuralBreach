@@ -10,7 +10,7 @@ Go + MyGo 原生桌面破解益智游戏。观察十六进制矩阵，从第一�
 
 ## 运行
 
-需要 `go.mod` 指定的 Go 1.27.3 和 MyGo v0.7.1。桌面程序不依赖 Node.js。Linux 运行需要 GTK 3。
+需要 `go.mod` 指定的 Go 1.27.4 和 MyGo v0.10.0。桌面程序不依赖 Node.js。Linux 运行需要 GTK 3。
 
 ```sh
 go mod download
@@ -42,7 +42,7 @@ make snapshots  # 五语言、多尺寸 UI 验证与英文/中文 PNG
 - [打包与发布](docs/releasing.md)
 - [设计图与视听预览](docs/design/neural-breach/README.md)
 
-文档站需要 Node.js 和 pnpm 12.15.0：`pnpm install`，然后 `pnpm docs:dev` 或 `pnpm docs:build`。
+文档站需要 Node.js 和 pnpm 12.21.0：`pnpm install`，然后 `pnpm docs:dev` 或 `pnpm docs:build`。
 
 ## 素材
 

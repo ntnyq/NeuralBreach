@@ -2,7 +2,7 @@
 
 ## Project structure
 
-Neural Breach is an offline native puzzle game built with Go 1.27.3 and MyGo v0.7.1. The pinned MyGo CLI is a Go tool; Node.js is only used for the VitePress documentation.
+Neural Breach is an offline native puzzle game built with Go 1.27.4 and MyGo v0.10.0. The pinned MyGo CLI is a Go tool; Node.js is only used for the VitePress documentation.
 
 - `main.go` is the native entry point. `window.go` owns shared state, navigation, lifecycle, and background-task dispatch; `menu.go` defines commands.
 - `session.go`, `generation.go`, `persistence.go`, and `settings.go` own session actions, puzzle-generation orchestration, persistence/export, and settings/audio synchronization.

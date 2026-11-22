@@ -14,6 +14,7 @@ import (
 
 func (w *window) breachView(c *ui.Context, s game.Session, replay bool) {
 	r := s.Puzzle.Difficulty.Rules()
+	buffer := s.Buffer()
 	scale := float32(w.data.Settings.Scale) / 100
 	ui.Row(c).Height(44 * scale).Shrink(0).AlignItems(ui.Center).Gap(18).Children(func() {
 		title(c, locales.Matrix())
@@ -39,12 +40,11 @@ func (w *window) breachView(c *ui.Context, s game.Session, replay bool) {
 		ui.Column(c).Grow(1).Gap(8).Children(func() {
 			sectionLabel(c, fmt.Sprintf("%s  %d/%d", locales.Buffer(), len(s.Steps), r.Capacity))
 			ui.Row(c).Gap(4).Children(func() {
-				b := s.Buffer()
 				for i := 0; i < r.Capacity; i++ {
 					code := "—"
 					col := muted
-					if i < len(b) {
-						code = b[i]
+					if i < len(buffer) {
+						code = buffer[i]
 						col = cyan
 					}
 					ui.Text(c, code).Width(39*scale).Height(40*scale).FontSize(23*scale).TextAlign(ui.Center).PaddingY(5).Border(1, col.Alpha(0.5)).TextColor(col)
@@ -76,20 +76,30 @@ func (w *window) breachView(c *ui.Context, s game.Session, replay bool) {
 		ui.Column(c).WidthPercent(48).Gap(10).Children(func() {
 			label := locales.Observe()
 			if len(s.Steps) > 0 {
-				label = locales.ChooseRow()
+				lastCell := s.Steps[len(s.Steps)-1].Cell
 				if len(s.Steps)%2 == 1 {
-					label = locales.ChooseColumn()
+					label = locales.ChooseColumn(lastCell%r.Size + 1)
+				} else {
+					label = locales.ChooseRow(lastCell/r.Size + 1)
 				}
 			}
-			ui.Text(c, label).TextColor(muted).FontSize(14 * scale)
+			direction := ui.Text(c, label).Key("direction").TextColor(muted).FontSize(14 * scale)
+			if !replay {
+				direction.Role(ui.RoleStatus)
+			}
 			w.board(c, s, replay, scale)
 		})
 		ui.Scroll(c).Grow(1).Height(bodyHeight).MinHeight(0).Children(func() {
 			ui.Column(c).Gap(16).Children(func() {
-				sectionLabel(c, locales.Targets())
+				ui.Row(c).Gap(12).Wrap().Children(func() {
+					sectionLabel(c, locales.Targets())
+					if !replay {
+						ui.Text(c, fmt.Sprintf("%s %d/%d", locales.Uploaded(), s.Uploaded(), len(s.Puzzle.Targets))).Key("target-progress").Role(ui.RoleStatus).TextColor(cyan)
+					}
+				})
 				names := []func() string{locales.Siphon, locales.Silence, locales.Erase, locales.Ghost}
 				for i, target := range s.Puzzle.Targets {
-					ok, k := game.Progress(s.Buffer(), target)
+					ok, k := game.Progress(buffer, target)
 					col := red
 					state := locales.Waiting()
 					if k > 0 {
@@ -151,9 +161,13 @@ func (w *window) board(c *ui.Context, s game.Session, replay bool, scale float32
 			}
 		}
 	}
-	ui.Column(c.Key("board")).Shrink(0).Gap(4).Children(func() {
+	role := ui.RoleGrid
+	if replay {
+		role = ui.RoleTable
+	}
+	ui.Column(c.Key("board")).Role(role).Label(locales.Matrix()).RowCount(n).ColumnCount(n).Multiselectable(!replay).Shrink(0).Gap(4).Children(func() {
 		for row := 0; row < n; row++ {
-			ui.Row(c).Shrink(0).Gap(4).Children(func() {
+			ui.Row(c).Role(ui.RoleRow).RowIndex(row + 1).Shrink(0).Gap(4).Children(func() {
 				for col := 0; col < n; col++ {
 					index := row*n + col
 					code := s.Puzzle.Board[index]
@@ -172,11 +186,21 @@ func (w *window) board(c *ui.Context, s game.Session, replay bool, scale float32
 						color = cyan
 						bg = cyan.Alpha(0.16)
 					}
-					if s.Mode == game.Tutorial && len(s.Steps) < len(s.Puzzle.Solution) && index == s.Puzzle.Solution[len(s.Steps)] {
+					trainingCell := s.Mode == game.Tutorial && len(s.Steps) < len(s.Puzzle.Solution) && index == s.Puzzle.Solution[len(s.Steps)]
+					if trainingCell {
 						color = cyan
 						bg = cyan.Alpha(0.17)
 					}
 					b := ui.Button(c, code).Key(fmt.Sprintf("cell-%d", index)).Label(fmt.Sprintf("R%d C%d %s", row+1, col+1, code)).Size(cell, cell).Padding(0).FontSize(26*scale).TextColor(color).Background(bg).Border(1, color.Alpha(0.35))
+					b.Role(ui.RoleCell).RowIndex(row + 1).ColumnIndex(col + 1)
+					if replay {
+						b.IgnoreInput(true).AccessDisabled(true)
+					} else {
+						b.AccessSelected(used).AccessDisabled(!legal || (s.Mode == game.Tutorial && !trainingCell))
+						if trainingCell || index == w.hintCell {
+							b.Description(locales.SuggestedCell())
+						}
+					}
 					if used {
 						step := 0
 						for i, v := range s.Steps {

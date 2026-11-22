@@ -16,7 +16,7 @@
     "format": "oxfmt"
   },
   "devDependencies": {
-    "oxfmt": "^0.75.0"
+    "oxfmt": "^0.79.0"
   },
-  "packageManager": "pnpm@12.15.0"
+  "packageManager": "pnpm@12.21.0"
 }

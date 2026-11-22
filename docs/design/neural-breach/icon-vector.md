@@ -20,7 +20,7 @@ All five apertures reference one `cell` definition through `matrix-cells`. The t
 
 ## Generation and packaging
 
-The SVG is the single source for the application and documentation icons. Install [resvg 0.48.1](https://github.com/linebender/resvg/releases/tag/v0.48.1) on `PATH`, then run from the repository root:
+The SVG is the single source for the application and documentation icons. Install [resvg 0.50.0](https://github.com/linebender/resvg/releases/tag/v0.50.0) on `PATH`, then run from the repository root:
 
 ```sh
 make icon

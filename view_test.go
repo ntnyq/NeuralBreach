@@ -7,6 +7,7 @@ import (
 	"image/png"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 	"time"
 
@@ -170,6 +171,70 @@ func TestKeyboardNavigationAndMute(t *testing.T) {
 	tt.Frame()
 	if len(w.session.Steps) != 1 {
 		t.Fatal("repeated confirmation consumed a slot")
+	}
+}
+
+func TestBoardAccessibility(t *testing.T) {
+	useLocale(t, "en")
+	w := fixtureWindow()
+	w.tutorial()
+	tt := ui.NewTester(w.view, 1100, 700)
+	tt.Frame()
+	tt.UseScreenReader()
+
+	puzzle := w.session.Puzzle
+	size := puzzle.Difficulty.Rules().Size
+	if grid, ok := tt.AccessByRole(ui.RoleGrid, locales.Matrix()); !ok || grid.RowCount != size || grid.ColumnCount != size {
+		t.Fatalf("matrix accessibility grid: %+v", grid)
+	}
+	cellName := func(index int) string {
+		return fmt.Sprintf("R%d C%d %s", index/size+1, index%size+1, puzzle.Board[index])
+	}
+	first := puzzle.Solution[0]
+	firstName := cellName(first)
+	if cell, ok := tt.AccessByRole(ui.RoleCell, firstName); !ok || cell.Disabled || cell.Selected || cell.RowIndex != 1 || cell.ColumnIndex != first+1 || cell.Description != locales.SuggestedCell() {
+		t.Fatalf("first tutorial cell: %+v", cell)
+	}
+	if cell, ok := tt.AccessByRole(ui.RoleCell, cellName((first+1)%size)); !ok || !cell.Disabled {
+		t.Fatalf("other cell in the first row: %+v", cell)
+	}
+	if err := tt.Click(firstName); err != nil {
+		t.Fatal(err)
+	}
+	tt.Frame()
+	if cell, ok := tt.AccessByRole(ui.RoleCell, firstName); !ok || !cell.Disabled || !cell.Selected {
+		t.Fatalf("used cell: %+v", cell)
+	}
+	if got := tt.Announcements(); !slices.Contains(got, locales.ChooseColumn(first%size+1)) {
+		t.Fatalf("missing column announcement: %q", got)
+	}
+	for _, index := range puzzle.Solution[1:3] {
+		if err := tt.Click(cellName(index)); err != nil {
+			t.Fatal(err)
+		}
+		tt.Frame()
+	}
+	progress := fmt.Sprintf("%s 1/%d", locales.Uploaded(), len(puzzle.Targets))
+	nextRow := locales.ChooseRow(puzzle.Solution[1]/size + 1)
+	if got := tt.Announcements(); !slices.Contains(got, progress) || !slices.Contains(got, nextRow) {
+		t.Fatalf("expected announcements for %q and %q, got %q", nextRow, progress, got)
+	}
+	tt.Frame()
+	if got := tt.Announcements(); len(got) > 0 {
+		t.Fatalf("unchanged statuses were announced again: %q", got)
+	}
+	w.pause()
+	tt.Frame()
+	if _, ok := tt.Access(firstName); ok {
+		t.Fatal("paused view exposed a matrix cell to assistive technology")
+	}
+	w.openReplay(*w.session)
+	tt.Frame()
+	if _, ok := tt.AccessByRole(ui.RoleTable, locales.Matrix()); !ok {
+		t.Fatal("replay matrix is missing its table semantics")
+	}
+	if cell, ok := tt.AccessByRole(ui.RoleCell, firstName); !ok || !cell.Disabled {
+		t.Fatalf("replay cell: %+v", cell)
 	}
 }
 func TestViewSnapshots(t *testing.T) {

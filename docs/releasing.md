@@ -16,7 +16,9 @@ go tool mygo build -skip-dmg
 
 输出位于 `build/`。字体通过 Go embed 打包，音乐通过代码生成，没有运行时字体或音频下载。
 
-应用图标和文档站图标统一来自 `resources/icon-macos.svg`。修改后使用 resvg 0.48.1 执行 `make icon`，并提交所有生成资源及清单；详见[图标生成说明](./design/neural-breach/icon-vector.md)。`make build` 和 CI/发布工作流在打包前自动校验图标是否同步，MyGo 从 `resources/icon.png` 生成各平台图标。正常打包无需安装 resvg；直接调用 MyGo CLI 时，先执行 `make icon-check`。
+Windows 发布包只使用原生 UI。手动打包时使用 `GOFLAGS=-tags=mygo_nowebview go tool mygo build -platform windows/amd64`，构建产物会省去 WebView2 加载代码。
+
+应用图标和文档站图标统一来自 `resources/icon-macos.svg`。修改后使用 resvg 0.50.0 执行 `make icon`，并提交所有生成资源及清单；详见[图标生成说明](./design/neural-breach/icon-vector.md)。`make build` 和 CI/发布工作流在打包前自动校验图标是否同步，MyGo 从 `resources/icon.png` 生成各平台图标。正常打包无需安装 resvg；直接调用 MyGo CLI 时，先执行 `make icon-check`。
 
 `.github/workflows/ci.yml` 检查格式、翻译生成一致性、竞态和 MyGo vet，并交叉编译 Windows/Linux、打包 macOS。发布工作流支持手动输入稳定版本号，生成更新日志、三平台安装包和校验和。工作流中的发布步骤会推送版本提交与 tag，并发布 GitHub Release；本地 `make build` 不会发布任何内容。
 

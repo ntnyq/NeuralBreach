@@ -20,7 +20,7 @@ import (
 const (
 	sourcePath      = "resources/icon-macos.svg"
 	manifestPath    = "tools/genicon/assets.json"
-	rendererVersion = "0.48.1"
+	rendererVersion = "0.50.0"
 )
 
 var inputPaths = []string{sourcePath, "tools/genicon/main.go"}
@@ -35,7 +35,7 @@ type manifest struct {
 func main() {
 	root := flag.String("root", ".", "repository root")
 	check := flag.Bool("check", false, "verify committed assets without invoking the renderer")
-	renderer := flag.String("renderer", "resvg", "path to resvg 0.48.1 (generation only)")
+	renderer := flag.String("renderer", "resvg", "path to resvg "+rendererVersion+" (generation only)")
 	flag.Parse()
 	var err error
 	if *check {
