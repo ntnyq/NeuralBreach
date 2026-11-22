@@ -37,6 +37,11 @@ func (w *window) applyScale() {
 }
 
 func (w *window) updateAudio() {
+	stage, config := w.audioState()
+	w.audio.Update(stage, config)
+}
+
+func (w *window) audioState() (sound.Stage, sound.Config) {
 	settings := w.data.Settings
 	if w.page == settingsPage {
 		settings = w.draft
@@ -63,14 +68,15 @@ func (w *window) updateAudio() {
 	case resultPage:
 		stage = sound.Result
 	}
-	if w.background && settings.BackgroundMute {
+	backgroundMuted := w.background && settings.BackgroundMute
+	if backgroundMuted {
 		stage = sound.Paused
 	}
-	w.audio.Update(stage, sound.Config{
+	return stage, sound.Config{
 		Master:  settings.Master,
 		Music:   settings.Music,
 		Effects: settings.Effects,
-		Muted:   settings.Muted,
+		Muted:   settings.Muted || backgroundMuted,
 		Dynamic: settings.Dynamic,
-	})
+	}
 }

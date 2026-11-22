@@ -84,13 +84,14 @@ type Engine struct {
 	source    *synth
 	effects   map[string]*audio.Sound
 	voices    []*audio.Player
+	play      func(*audio.Sound, float64) *audio.Player
 	settings  Config
 	lastError time.Time
 }
 
 func New() *Engine {
 	s := &synth{}
-	e := &Engine{source: s, effects: map[string]*audio.Sound{}}
+	e := &Engine{source: s, effects: map[string]*audio.Sound{}, play: playSound}
 	for name, freq := range map[string]float64{"select": 680, "move": 320, "invalid": 120, "upload": 1040, "complete": 880, "fail": 65, "glitch": 180} {
 		duration := 0.12
 		if name == "complete" {
@@ -133,7 +134,7 @@ func (e *Engine) Update(stage Stage, s Config) {
 	e.source.gain.Store(math.Float64bits(s.Music / 100))
 }
 func (e *Engine) Effect(name string) {
-	if e == nil {
+	if e == nil || e.settings.Muted {
 		return
 	}
 	if name == "invalid" && time.Since(e.lastError) < 150*time.Millisecond {
@@ -152,11 +153,17 @@ func (e *Engine) Effect(name string) {
 			}
 		}
 		e.voices = active
-		p := s.NewPlayer().SetVolume(e.settings.Effects / 100)
-		p.Play()
+		p := e.play(s, e.settings.Effects/100)
 		e.voices = append(e.voices, p)
 	}
 }
+
+func playSound(s *audio.Sound, volume float64) *audio.Player {
+	p := s.NewPlayer().SetVolume(volume)
+	p.Play()
+	return p
+}
+
 func (e *Engine) Close() {
 	if e == nil {
 		return

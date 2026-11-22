@@ -314,3 +314,57 @@ func TestViewSnapshotsProtectedData(t *testing.T) {
 		})
 	}
 }
+
+func TestViewSnapshotsGameSaveFailure(t *testing.T) {
+	if err := registerFonts(); err != nil {
+		t.Fatal(err)
+	}
+	puzzle, err := game.Generate(context.Background(), 2077, 3)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tag := range locales.Catalog.Languages() {
+		t.Run(tag, func(t *testing.T) {
+			useLocale(t, tag)
+			for _, scale := range []int{100, 125, 150} {
+				for _, p := range []page{gamePage, replayPage} {
+					width, height := 1100*scale/100, 700*scale/100
+					w := fixtureWindow()
+					w.data.Settings.Scale = scale
+					w.page = p
+					w.glitchStart = time.Time{}
+					s := game.New(puzzle, game.Practice, true, "active", time.Now())
+					w.session, w.result = &s, &s
+					w.saveErr = errors.New("replace /temporary/neural-breach/data.json: permission denied")
+					tt := ui.NewTester(w.view, width, height)
+					tt.SetLocale(tag)
+					tt.Frame()
+					for _, label := range []string{locales.SaveFailed(), locales.RetrySave(), locales.DiscardQuit()} {
+						recovery, ok := tt.Find(label)
+						if !ok || recovery.X < 0 || recovery.Y < 0 || recovery.X+recovery.W > float32(width) || recovery.Y+recovery.H > float32(height) {
+							t.Fatalf("recovery action clipped: page=%d scale=%d label=%s rect=%+v", p, scale, label, recovery)
+						}
+						for cell, code := range puzzle.Board {
+							board, ok := tt.Find(fmt.Sprintf("R%d C%d %s", cell/8+1, cell%8+1, code))
+							if !ok || board.W+0.01 < 44*float32(scale)/100 || board.H+0.01 < 44*float32(scale)/100 {
+								t.Fatalf("board cell missing or too small: page=%d scale=%d cell=%d rect=%+v", p, scale, cell, board)
+							}
+							if recovery.X < board.X+board.W && recovery.X+recovery.W > board.X && recovery.Y < board.Y+board.H && recovery.Y+recovery.H > board.Y {
+								t.Fatalf("recovery overlaps the board: page=%d scale=%d label=%s cell=%d", p, scale, label, cell)
+							}
+						}
+						if p == gamePage {
+							for _, action := range []string{locales.Hint(), locales.Undo(), locales.Finish()} {
+								control, ok := tt.Find(action)
+								if !ok || recovery.X < control.X+control.W && recovery.X+recovery.W > control.X && recovery.Y < control.Y+control.H && recovery.Y+recovery.H > control.Y {
+									t.Fatalf("recovery overlaps or hides %s: scale=%d", action, scale)
+								}
+							}
+						}
+					}
+					writeViewSnapshot(t, tt, fmt.Sprintf("%s-save-failed-%d-%d", tag, p, scale))
+				}
+			}
+		})
+	}
+}

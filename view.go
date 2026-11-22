@@ -118,7 +118,9 @@ func (w *window) view(c *ui.Context) {
 				w.settingsView(c)
 			}
 		})
-		w.statusView(c)
+		if w.page != gamePage && w.page != replayPage {
+			w.statusView(c)
+		}
 		ui.Row(c).Shrink(0).Gap(12).Children(func() {
 			ui.Text(c, "◆  "+locales.Controls()).FontSize(13 * float32(scale) / 100).TextColor(muted)
 			ui.Spacer(c)
@@ -157,19 +159,19 @@ func (w *window) view(c *ui.Context) {
 
 func (w *window) statusView(c *ui.Context) {
 	if w.loadErr != nil {
-		ui.Row(c).Gap(12).Children(func() {
-			ui.Text(c, locales.DataDamaged()).TextColor(red)
+		ui.Row(c).Shrink(0).Gap(12).Wrap().Children(func() {
+			ui.Text(c, locales.DataDamaged()).TextColor(red).Wrap()
 			button(c, locales.Repair(), w.repair)
 			button(c, locales.DiscardQuit(), func() { w.ask(locales.DiscardConfirm, w.quitWithoutSave) })
 		})
-		ui.Text(c, w.loadErr.Error()).TextColor(muted).FontSize(12)
+		ui.Text(c, w.loadErr.Error()).TextColor(muted).FontSize(12).Wrap().Shrink(0)
 	} else if w.saveErr != nil {
-		ui.Row(c).Gap(10).Children(func() {
-			ui.Text(c, locales.SaveFailed()).TextColor(red)
+		ui.Row(c).Shrink(0).Gap(10).Wrap().Children(func() {
+			ui.Text(c, locales.SaveFailed()).TextColor(red).Wrap()
 			button(c, locales.RetrySave(), func() { w.persist(nil) })
 			button(c, locales.DiscardQuit(), func() { w.ask(locales.DiscardConfirm, w.quitWithoutSave) })
 		})
-		ui.Text(c, w.saveErr.Error()).TextColor(muted).FontSize(12)
+		ui.Text(c, w.saveErr.Error()).TextColor(muted).FontSize(12).Wrap().Shrink(0)
 	}
 	if w.errorDetail != nil {
 		ui.Text(c, w.errorDetail.Error()).TextColor(red).Wrap()

@@ -61,4 +61,4 @@ pnpm install
 pnpm docs:build
 ```
 
-`make snapshots` 验证五种语言、两种常规尺寸和 150% 文字，并把中文/英文 PNG 放入忽略提交的 `snapshots/`。原生冒烟截图可用 `NEURAL_BREACH_CAPTURE=截图路径 go run . --data 测试数据路径`；应用会在截图后退出。使用独立数据路径，避免影响自己的成绩。
+`make snapshots` 验证五种语言、两种常规尺寸和 150% 文字，并把中文/英文 PNG 放入忽略提交的 `snapshots/`；保存失败状态另导出五语言在 100%/125%/150% 下的对局与复盘快照。原生冒烟截图可用 `NEURAL_BREACH_CAPTURE=截图路径 go run . --data 测试数据路径`；应用会在截图后退出。使用独立数据路径，避免影响自己的成绩。

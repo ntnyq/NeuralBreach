@@ -89,33 +89,38 @@ func (w *window) breachView(c *ui.Context, s game.Session, replay bool) {
 			}
 			w.board(c, s, replay, scale)
 		})
-		ui.Scroll(c).Grow(1).Height(bodyHeight).MinHeight(0).Children(func() {
-			ui.Column(c).Gap(16).Children(func() {
-				ui.Row(c).Gap(12).Wrap().Children(func() {
-					sectionLabel(c, locales.Targets())
-					if !replay {
-						ui.Text(c, fmt.Sprintf("%s %d/%d", locales.Uploaded(), s.Uploaded(), len(s.Puzzle.Targets))).Key("target-progress").Role(ui.RoleStatus).TextColor(cyan)
+		// Keep recovery controls beside the board. Adding them below the page
+		// would take space from the fixed-size matrix at the minimum window size.
+		ui.Column(c).Grow(1).Height(bodyHeight).MinHeight(0).Gap(8).Children(func() {
+			w.statusView(c)
+			ui.Scroll(c).Grow(1).MinHeight(0).Children(func() {
+				ui.Column(c).Gap(16).Children(func() {
+					ui.Row(c).Gap(12).Wrap().Children(func() {
+						sectionLabel(c, locales.Targets())
+						if !replay {
+							ui.Text(c, fmt.Sprintf("%s %d/%d", locales.Uploaded(), s.Uploaded(), len(s.Puzzle.Targets))).Key("target-progress").Role(ui.RoleStatus).TextColor(cyan)
+						}
+					})
+					names := []func() string{locales.Siphon, locales.Silence, locales.Erase, locales.Ghost}
+					for i, target := range s.Puzzle.Targets {
+						ok, k := game.Progress(buffer, target)
+						col := red
+						state := locales.Waiting()
+						if k > 0 {
+							col = yellow
+							state = fmt.Sprintf("%s %d/%d", locales.Matching(), k, len(target))
+						}
+						if ok {
+							col = cyan
+							state = "✓ " + locales.Uploaded()
+						}
+						ui.Column(c).Shrink(0).Padding(11, 17).Gap(5).Border(1, col.Alpha(0.45)).Background(panel).Children(func() {
+							ui.Text(c, names[i]()).TextColor(col).FontSize(19 * scale)
+							ui.Text(c, strings.Join(target, "  ")).FontSize(27 * scale).TextColor(yellow)
+							ui.Text(c, state).FontSize(14 * scale).TextColor(col)
+						})
 					}
 				})
-				names := []func() string{locales.Siphon, locales.Silence, locales.Erase, locales.Ghost}
-				for i, target := range s.Puzzle.Targets {
-					ok, k := game.Progress(buffer, target)
-					col := red
-					state := locales.Waiting()
-					if k > 0 {
-						col = yellow
-						state = fmt.Sprintf("%s %d/%d", locales.Matching(), k, len(target))
-					}
-					if ok {
-						col = cyan
-						state = "✓ " + locales.Uploaded()
-					}
-					ui.Column(c).Shrink(0).Padding(11, 17).Gap(5).Border(1, col.Alpha(0.45)).Background(panel).Children(func() {
-						ui.Text(c, names[i]()).TextColor(col).FontSize(19 * scale)
-						ui.Text(c, strings.Join(target, "  ")).FontSize(27 * scale).TextColor(yellow)
-						ui.Text(c, state).FontSize(14 * scale).TextColor(col)
-					})
-				}
 			})
 		})
 	})

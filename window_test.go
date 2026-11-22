@@ -16,11 +16,7 @@ import (
 // thread just as Window.Update does. No sleeps or concurrent state polling.
 func persistentWindow(t *testing.T, path string) (*window, func()) {
 	t.Helper()
-	store, data, err := records.Open(path)
-	w := newWindow(store, data, err)
-	queue := make(chan func(), 32)
-	w.postUpdate = func(fn func()) { queue <- fn }
-	t.Cleanup(w.close)
+	w, queue := queuedWindow(t, path)
 	return w, func() {
 		t.Helper()
 		timer := time.NewTimer(5 * time.Second)
@@ -33,6 +29,119 @@ func persistentWindow(t *testing.T, path string) (*window, func()) {
 				t.Fatal("save completion was not dispatched")
 			}
 		}
+	}
+}
+
+func queuedWindow(t *testing.T, path string) (*window, chan func()) {
+	t.Helper()
+	store, data, err := records.Open(path)
+	w := newWindow(store, data, err)
+	queue := make(chan func(), 32)
+	w.postUpdate = func(fn func()) { queue <- fn }
+	t.Cleanup(w.close)
+	return w, queue
+}
+
+func nextWindowUpdate(t *testing.T, queue <-chan func()) func() {
+	t.Helper()
+	select {
+	case fn := <-queue:
+		return fn
+	case <-time.After(5 * time.Second):
+		t.Fatal("window update was not dispatched")
+		return nil
+	}
+}
+
+func TestQuitWaitsForLatestSave(t *testing.T) {
+	for _, order := range []string{"old first", "new first"} {
+		t.Run(order, func(t *testing.T) {
+			path := filepath.Join(t.TempDir(), "data.json")
+			w, queue := queuedWindow(t, path)
+			w.saveQuit()
+			older := nextWindowUpdate(t, queue)
+			w.data.Settings.Master = 42
+			w.persist(nil)
+			newer := nextWindowUpdate(t, queue)
+			if w.allowClose {
+				t.Fatal("quit before the latest save was acknowledged")
+			}
+			if order == "old first" {
+				older()
+				if w.allowClose {
+					t.Fatal("an older save allowed closing")
+				}
+				newer()
+			} else {
+				newer()
+				older()
+			}
+			if !w.allowClose || w.savedRevision != w.data.Revision {
+				t.Fatalf("successful latest save did not allow closing: quitting=%t saved=%d current=%d", w.quitting, w.savedRevision, w.data.Revision)
+			}
+			_, saved, err := records.Open(path)
+			if err != nil || saved.Settings.Master != 42 || saved.Revision != w.data.Revision {
+				t.Fatalf("quit lost the latest state: %+v, %v", saved, err)
+			}
+		})
+	}
+}
+
+func TestQuitCancelsQueuedGeneration(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "data.json")
+	w, queue := queuedWindow(t, path)
+	w.navigate(setupPage)
+	w.generate()
+	generated := nextWindowUpdate(t, queue)
+	w.saveQuit()
+	generated()
+	if w.session != nil || w.task.Running() || w.page != setupPage {
+		t.Fatal("queued generation changed the window during quit")
+	}
+	nextWindowUpdate(t, queue)()
+	if !w.allowClose || w.savedRevision != w.data.Revision {
+		t.Fatal("quit did not finish after canceling generation")
+	}
+	_, saved, err := records.Open(path)
+	if err != nil || saved.Active != nil || len(saved.PuzzleFingerprints) != 1 {
+		t.Fatalf("canceled generation changed the active slot or lost its reservation: %+v, %v", saved, err)
+	}
+}
+
+func TestFailedQuitCanRetryWithoutExiting(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "data.json")
+	w, queue := queuedWindow(t, path)
+	w.saveQuit()
+	older := nextWindowUpdate(t, queue)
+	if err := os.Remove(path); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Mkdir(path, 0o700); err != nil {
+		t.Fatal(err)
+	}
+	w.data.Settings.Master = 42
+	w.persist(nil)
+	failed := nextWindowUpdate(t, queue)
+	older()
+	if w.allowClose {
+		t.Fatal("an older success allowed closing after the latest write failed")
+	}
+	failed()
+	if w.quitting || w.allowClose || w.saveErr == nil {
+		t.Fatal("failed save did not cancel exiting")
+	}
+	if err := os.Remove(path); err != nil {
+		t.Fatal(err)
+	}
+	w.persist(nil)
+	nextWindowUpdate(t, queue)()
+	if w.allowClose || w.quitting || w.saveErr != nil {
+		t.Fatal("retry unexpectedly exited or failed to save")
+	}
+	w.saveQuit()
+	nextWindowUpdate(t, queue)()
+	if !w.allowClose {
+		t.Fatal("a new quit request did not complete")
 	}
 }
 

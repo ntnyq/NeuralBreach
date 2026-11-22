@@ -13,9 +13,7 @@ import (
 
 func (w *window) persist(after func()) {
 	if w.store == nil {
-		if after != nil {
-			after()
-		}
+		w.completeSave(after)
 		return
 	}
 	if w.session != nil {
@@ -38,9 +36,7 @@ func (w *window) persist(after func()) {
 			w.saveErr = err
 			if err == nil {
 				w.savedRevision = rev
-				if after != nil {
-					after()
-				}
+				w.completeSave(after)
 			} else {
 				w.quitting = false
 			}
@@ -48,14 +44,20 @@ func (w *window) persist(after func()) {
 	}()
 }
 
+func (w *window) completeSave(after func()) {
+	// Quit intent belongs to the window, even when another save supersedes
+	// the snapshot that first requested it.
+	if w.quitting {
+		w.quitWithoutSave()
+	} else if after != nil {
+		after()
+	}
+}
+
 func (w *window) saveQuit() {
+	w.task.Cancel()
 	w.quitting = true
-	w.persist(func() {
-		w.allowClose = true
-		if w.win != nil {
-			mygo.App.Quit()
-		}
-	})
+	w.persist(nil)
 }
 
 func (w *window) repair() {
